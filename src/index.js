@@ -2,22 +2,20 @@ import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
+import { Giphy } from './giphy.js';
 
 $("#search").submit((event) => {
-  event.preventDefault();
   const searchTerm = $("#searchTerm").val();
+  const search = `http://api.giphy.com/v1/stickers/search?q=${searchTerm}&api_key=${process.env.API_KEY}`;
+  event.preventDefault();
   $("#searchTerm").val("");
-
-  let request = new XMLHttpRequest();
-  const url = `http://api.giphy.com/v1/stickers/search?q=${searchTerm}&api_key=${process.env.API_KEY}`;
-  request.onreadystatechange = function() {
-    if (this.readyState === 4 && this.status === 200) {
-      const response = JSON.parse(this.responseText);
-      outputGifs(response);
-    }
-  };
-  request.open("GET", url, true);
-  request.send();
+  let promise = Giphy.getGiphy(search);
+  promise.then(function(result) {
+    const response = JSON.parse(result);
+    outputGifs(response);
+  }, function(error) {
+    $('#showErrors').text(`There was an error processing your request: ${error}`);
+  });
 });
 
 function outputGifs(response) {
@@ -35,29 +33,23 @@ function outputGifs(response) {
 }
 
 $("#trendSearch").click(() => {
-
-  let request = new XMLHttpRequest();
-  const url = `http://api.giphy.com/v1/gifs/trending?&api_key=${process.env.API_KEY}`;
-  request.onreadystatechange = function() {
-    if (this.readyState === 4 && this.status === 200) {
-      const response = JSON.parse(this.responseText);
-      outputGifs(response);
-    }
-  };
-  request.open("GET", url, true);
-  request.send();  
+  const trending = `http://api.giphy.com/v1/gifs/trending?&api_key=${process.env.API_KEY}`;
+  let promise2 = Giphy.getGiphy(trending);
+  promise2.then(function(result) {
+    const response = JSON.parse(result);
+    outputGifs(response);
+  }, function(error) {
+    $('#showErrors').text(`There was an error processing your request: ${error}`);
+  });
 });
 
 $("#randomSearch").click(() => {
-
-  let request = new XMLHttpRequest();
-  const url = `http://api.giphy.com/v1/gifs/random?&api_key=${process.env.API_KEY}`;
-  request.onreadystatechange = function() {
-    if (this.readyState === 4 && this.status === 200) {
-      const response = JSON.parse(this.responseText);
-      outputGifs(response);
-    }
-  };
-  request.open("GET", url, true);
-  request.send();
+  const random = `http://api.giphy.com/v1/gifs/random?&api_key=${process.env.API_KEY}`;
+  let promise3 = Giphy.getGiphy(random);
+  promise3.then(function(result) {
+    const response = JSON.parse(result);
+    outputGifs(response);
+  }, function(error) {
+    $('#showErrors').text(`There was an error processing your request: ${error}`);
+  });
 });
